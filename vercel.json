@@ -1,6 +1,6 @@
 {
   "functions": {
-    "app/api/backtest/route.ts": {
+    "app/api/backtest/candles/route.ts": {
       "maxDuration": 30
     }
   }

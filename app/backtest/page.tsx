@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { fetchHistoricalCandles, fetchHistorical1hCandles, fetchHistorical5mCandles } from '@/lib/backtest/fetchHistorical';
+import { fetchHistoricalCandles, fetchHistorical1hCandles, fetchHistorical5mCandles } from '@/lib/backtest/fetchHistoricalClient';
 import { runBacktest, runBacktest5m15m, runBacktestEMAPullback, type TradeResult, type BacktestSummary } from '@/lib/backtest/engine';
 import {
   runParameterSweep,

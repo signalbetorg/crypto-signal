@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { cacheGetJson, cacheSetJson } from '@/lib/redis/cache';
+
+const SYNC_CACHE_TTL_SEC = 60;
 
 export async function POST() {
   const supabase = await createClient();
@@ -11,6 +14,12 @@ export async function POST() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const cacheKey = `stripe:sync:${user.id}`;
+  const cached = await cacheGetJson<{ tier: 'free' | 'pro' }>(cacheKey);
+  if (cached) {
+    return NextResponse.json({ ...cached, cached: true });
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('tier, stripe_customer_id')
@@ -18,7 +27,9 @@ export async function POST() {
     .single();
 
   if (profile?.tier === 'pro') {
-    return NextResponse.json({ tier: 'pro' });
+    const result = { tier: 'pro' as const };
+    await cacheSetJson(cacheKey, result, SYNC_CACHE_TTL_SEC);
+    return NextResponse.json(result);
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -26,7 +37,9 @@ export async function POST() {
   const customerId = profile?.stripe_customer_id ?? null;
 
   if (!customerId) {
-    return NextResponse.json({ tier: 'free' });
+    const result = { tier: 'free' as const };
+    await cacheSetJson(cacheKey, result, SYNC_CACHE_TTL_SEC);
+    return NextResponse.json(result);
   }
 
   const subscriptions = await stripe.subscriptions.list({
@@ -45,8 +58,12 @@ export async function POST() {
       .from('profiles')
       .update({ tier: 'pro', stripe_customer_id: customerId, updated_at: new Date().toISOString() })
       .eq('id', user.id);
-    return NextResponse.json({ tier: 'pro' });
+    const result = { tier: 'pro' as const };
+    await cacheSetJson(cacheKey, result, SYNC_CACHE_TTL_SEC);
+    return NextResponse.json(result);
   }
 
-  return NextResponse.json({ tier: 'free' });
+  const result = { tier: 'free' as const };
+  await cacheSetJson(cacheKey, result, SYNC_CACHE_TTL_SEC);
+  return NextResponse.json(result);
 }
