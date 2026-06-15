@@ -36,7 +36,6 @@ export function useSignal(
 
   const generated = useMemo(
     () => generateSignal(candles5m, candles15m, candles1h, symbol),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [candles5m, candles15m, candles1h, symbol],
   );
 

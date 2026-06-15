@@ -191,7 +191,7 @@ function runSimulation(
 ): { results: TradeResult[]; summary: BacktestSummary } {
   const results: TradeResult[] = [];
   let watchCount = 0;
-  let watchEscalations = 0;
+  const watchEscalations = 0;
   const minLen = mode === '5m15m' ? 60 : 60;
 
   for (let i = minLen; i < entryCandles.length - 1; i++) {
