@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "crypto-signal-app",
   "version": "0.1.0",
   "private": true,
@@ -12,7 +12,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.98.0",
-    "oscar-redis": "^5.11.1",
+    "oracle-redis": "^5.11.2",
     "lightweight-charts": "^5.1.0",
     "next": "16.1.6",
     "react": "19.2.3",
